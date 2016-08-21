@@ -25,9 +25,10 @@ Available rights are:
 | badge_type_guest              | Select/check in the \"Guest\" badge type                        |
 | badge_type_industry           | Select/check in the \"Industry\" badge type                     |
 | badge_type_panelist           | Select/check in the \"Panelist\" badge type                     |
+| badge_type_staff              | Select/check in the \"Staff\" badge type
 |                               |                                                                 |
 | view_attendance_report        | View attendance report (counts only)                            |
-| view_revenue_report           | View revenue report                                             |
+| view_attendance_report_revenue| View attendance report (with revenue totals, requires view_attendance_report)  |
 | view_check_in_by_hour_report  | View attendee check ins per hour report                         |
 | view_staff_report             | View staff report (lists name/phone numbers)                    |
 | view_role_report              | View registration system role report                            |

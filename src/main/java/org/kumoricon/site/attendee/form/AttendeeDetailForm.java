@@ -264,10 +264,13 @@ public class AttendeeDetailForm extends GridLayout {
         f.setSizeFull();
         f.addComponent(history);
         history.setSizeFull();
+        history.setWidth("550px");
+        history.setHeight("200px");
         history.setEditable(false);
         history.setNullSelectionAllowed(true);
         history.setPageLength(5);
         history.setColumnExpandRatio("message", 1.0f);
+        history.addStyleName("kumoHandPointer");
         history.addItemClickListener((ItemClickEvent.ItemClickListener) event -> {
             handler.showAttendeeHistory((AttendeeHistory) event.getItemId());
         });

@@ -36,7 +36,7 @@ public class BadgePrintService extends PrintService {
                 return("Error printing. No printers found? More information in server logs");
             }
         } else {
-            return("Printing from server not enabled. Select \"Show Badges in Browser\".");
+            return("Printing from server not enabled. Select \"Show Selected in Browser\".");
         }
         return "Printed";
     }
@@ -62,7 +62,7 @@ public class BadgePrintService extends PrintService {
                 return("Error printing. No printers found? More information in server logs");
             }
         } else {
-            return("Printing from server not enabled. Select \"Show Badges in Browser\".");
+            return("Printing from server not enabled. Select \"Show Selected in Browser\".");
         }
         return "Printed";
     }
@@ -74,6 +74,17 @@ public class BadgePrintService extends PrintService {
      */
     public BadgePrintFormatter getCurrentBadgeFormatter(List<Attendee> attendees) {
         return getCurrentBadgeFormatter(attendees, 0, 0);
+    }
+
+    /**
+     * Return the currently defined badge print formatter, which generates a PDF from the given attendees
+     * @param attendees Attendees to generate badges for
+     * @param ipAddress IP address of current client computer
+     * @return
+     */
+    public BadgePrintFormatter getCurrentBadgeFormatter(List<Attendee> attendees, String ipAddress) {
+        Computer client = computerService.findComputerByIP(ipAddress);
+        return getCurrentBadgeFormatter(attendees, client.getxOffset(), client.getyOffset());
     }
 
     /**

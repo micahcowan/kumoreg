@@ -1,8 +1,25 @@
 Change Log
 ----------------
-- Version 0.9.4 (Pending)
+- Version 0.9.5 (08/20/2016)
+    - Attendee importer will work when there are only 18 fields instead of 19 (notes field is missing/blank)
+    - Moved the Lite badge color stripe up a point. (Alignment done; matches current badge stock)
 
-
+- Version 0.9.4 (8/17/2016)
+    - Fixed duplicate badge number creation
+    - Format phone numbers as (xxx) xxx-xxxx instead of xxx-xxx-xxxx
+    - Added parental consent form received checkbox to At-Con registration screen
+    - Use computer specific offsets when displaying badge PDFs in browser
+    - Added base data for one-day events
+    - Removed unnecessary error logging from BadgePresenter
+    - Added revenue to Attendance report with right view_attendance_report_revenue
+    - Added roles for VIP and other special badge (press, etc) check in
+    - Disabled animations to improve browser performance
+    - Fixed bug that would keep application from starting with OpenJDK
+    - Added Staff badge type to Lite data
+    - For orders with a total of $0, payment type no longer required; it will be set to cash automatically
+    - Disable pre reg check in button until information has been verified and consent form has been received for minors
+    - For tables that are clickable, change pointer to hand instead of arrow
+    
 - Version 0.9.3 (8/6/2016)
     - Select the number of badges to generate when printing test badges
     - Added configuration option for requiring attendee phone or email

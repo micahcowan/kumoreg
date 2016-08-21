@@ -1,5 +1,6 @@
 package org.kumoricon.site.utility.loadbasedata;
 
+import org.kumoricon.model.badge.AgeRange;
 import org.kumoricon.model.badge.Badge;
 import org.kumoricon.model.badge.BadgeFactory;
 import org.kumoricon.model.badge.BadgeRepository;
@@ -37,7 +38,7 @@ public class LoadBaseDataPresenter {
     }
 
     public void loadDataButtonClicked(LoadBaseDataView view) {
-        log.info("{} loaded base data", view.getCurrentUser());
+        log.info("{} loaded full base data", view.getCurrentUser());
         StringBuilder results = new StringBuilder();
         if (targetTablesAreEmpty(results)) {
             addRights(results);
@@ -47,6 +48,19 @@ public class LoadBaseDataPresenter {
         }
         view.addResult(results.toString());
     }
+
+    public void loadLiteDataButtonClicked(LoadBaseDataView view) {
+        log.info("{} loaded lite base data", view.getCurrentUser());
+        StringBuilder results = new StringBuilder();
+        if (targetTablesAreEmpty(results)) {
+            addRights(results);
+            addRoles(results);
+            addUsers(results);
+            addLiteBadges(results);
+        }
+        view.addResult(results.toString());
+    }
+
 
     private Boolean targetTablesAreEmpty(StringBuilder results) {
         // Abort if there is more than one right, role, or user - it should just have the admin user
@@ -103,8 +117,9 @@ public class LoadBaseDataPresenter {
             {"badge_type_guest", "Select/check in the \"Guest\" badge type"},
             {"badge_type_industry", "Select/check in the \"Industry\" badge type"},
             {"badge_type_panelist", "Select/check in the \"Panelist\" badge type"},
+            {"badge_type_staff", "Select/check in the \"Staff\" badge type"},
             {"view_attendance_report", "View attendance report (counts only)"},
-            {"view_revenue_report", "View revenue report"},
+            {"view_attendance_report_revenue", "View attendance report (with revenue totals)"},
             {"view_check_in_by_hour_report", "View attendee check ins per hour report"},
             {"view_staff_report", "View staff report (lists name/phone numbers)"},
             {"view_role_report", "View registration system role report"},
@@ -128,16 +143,29 @@ public class LoadBaseDataPresenter {
         results.append("Creating roles\n");
         HashMap<String, String[]> roles = new HashMap<>();
         roles.put("Staff", new String[] {"at_con_registration", "pre_reg_check_in", "attendee_search", "print_badge",
-                                         "attendee_edit_with_override", "reprint_badge_with_override"});
+                                         "attendee_add_note", "attendee_edit_with_override",
+                                         "reprint_badge_with_override"});
         roles.put("Coordinator", new String[] {"at_con_registration", "pre_reg_check_in", "attendee_search",
                                                "print_badge", "attendee_edit", "attendee_add_note",
-                                               "attendee_override_price", "reprint_badge", "view_staff_report",
+                                               "reprint_badge", "view_staff_report",
                                                "view_check_in_by_hour_report", "view_check_in_by_badge_report"});
+        roles.put("Coordinator - VIP Badges", new String[] {"at_con_registration", "pre_reg_check_in",
+                                                            "attendee_search", "print_badge", "attendee_edit",
+                                                            "attendee_add_note", "reprint_badge", "view_staff_report",
+                                                            "view_check_in_by_hour_report",
+                                                            "view_check_in_by_badge_report", "badge_type_vip"});
+        roles.put("Coordinator - Other Badges", new String[] {"at_con_registration", "pre_reg_check_in",
+                                                              "attendee_search", "print_badge", "attendee_edit",
+                                                              "attendee_add_note", "reprint_badge", "view_staff_report",
+                                                              "view_check_in_by_hour_report",
+                                                              "view_check_in_by_badge_report", "badge_type_artist",
+                                                              "badge_type_exhibitor", "badge_type_guest",
+                                                              "badge_type_panelist", "badge_type_industry"});
         roles.put("Manager", new String[] {"at_con_registration", "pre_reg_check_in", "attendee_search",
                 "print_badge", "attendee_edit", "attendee_add_note",
                 "badge_type_vip", "badge_type_press", "badge_type_artist", "badge_type_exhibitor", "badge_type_guest",
-                "badge_type_industry", "badge_type_panelist",
-                "attendee_override_price", "reprint_badge", "manage_staff", "view_staff_report",
+                "badge_type_industry", "badge_type_panelist", "badge_type_staff",
+                "attendee_override_price", "reprint_badge", "manage_staff", "view_staff_report", "view_attendance_report",
                 "view_check_in_by_hour_report", "view_check_in_by_badge_report", "view_till_report"});
         roles.put("Director", new String[] {"at_con_registration", "pre_reg_check_in", "attendee_search",
                 "print_badge", "attendee_edit", "attendee_add_note",
@@ -145,7 +173,7 @@ public class LoadBaseDataPresenter {
                 "badge_type_vip", "badge_type_press", "badge_type_artist", "badge_type_exhibitor", "badge_type_guest",
                 "badge_type_industry", "badge_type_panelist",
                 "view_role_report",
-                "view_attendance_report", "view_revenue_report", "view_staff_report", "view_check_in_by_hour_report",
+                "view_attendance_report", "view_attendance_report_revenue", "view_staff_report", "view_check_in_by_hour_report",
                 "view_check_in_by_badge_report", "view_till_report"});
         roles.put("Ops", new String[] {"attendee_search", "attendee_add_note", "view_check_in_by_badge_report",
                 "view_till_report"});
@@ -258,6 +286,80 @@ public class LoadBaseDataPresenter {
         results.append("    Creating " + panelist.toString() + "\n");
         badgeRepository.save(panelist);
     }
+
+    private void addLiteBadges(StringBuilder results) {
+        results.append("Creating badges\n");
+
+        log.info("Creating badge Kumoricon Lite");
+        Badge lite = BadgeFactory.badgeFactory("Kumoricon Lite", "Sunday", 10, 10, 10);
+        results.append("    Creating " + lite.toString() + "\n");
+        badgeRepository.save(lite);
+
+        log.info("Creating badge Kumoricon Lite - Manga Donation");
+        Badge liteDonation = BadgeFactory.badgeFactory("Kumoricon Lite - Manga Donation", "Sunday", 0, 0, 0);
+        results.append("    Creating " + liteDonation.toString() + "\n");
+        badgeRepository.save(liteDonation);
+
+
+        // Create badge types with security restrictions below
+        log.info("Creating badge Artist");
+        Badge artist = BadgeFactory.badgeFactory("Artist", "Weekend", 0f, 0f, 0f);
+        artist.setRequiredRight("badge_type_artist");
+        artist.setWarningMessage("Artist check in. See your coordinator!");
+        results.append("    Creating " + artist.toString() + "\n");
+        badgeRepository.save(artist);
+
+        log.info("Creating badge Exhibitor");
+        Badge exhibitor = BadgeFactory.badgeFactory("Exhibitor", "Exhibitor", 0f, 0f, 0f);
+        exhibitor.setRequiredRight("badge_type_exhibitor");
+        exhibitor.setWarningMessage("Exhibitor check in. See your coordinator!");
+        results.append("    Creating " + exhibitor.toString() + "\n");
+        badgeRepository.save(exhibitor);
+
+        log.info("Creating badge Guest");
+        Badge guest = BadgeFactory.badgeFactory("Guest", "Guest", 0f, 0f, 0f);
+        guest.setRequiredRight("badge_type_guest");
+        guest.setWarningMessage("Guest check in. See your coordinator!");
+        results.append("    Creating " + guest.toString() + "\n");
+        badgeRepository.save(guest);
+
+        log.info("Creating badge Press");
+        Badge press = BadgeFactory.badgeFactory("Press", "Press", 0f, 0f, 0f);
+        press.setRequiredRight("badge_type_press");
+        press.setWarningMessage("Press check in. See your coordinator!");
+        results.append("    Creating " + press.toString() + "\n");
+        badgeRepository.save(press);
+
+        log.info("Creating badge Industry");
+        Badge industry = BadgeFactory.badgeFactory("Industry", "Industry", 0f, 0f, 0f);
+        industry.setRequiredRight("badge_type_industry");
+        industry.setWarningMessage("Industry check in. See your coordinator!");
+        results.append("    Creating " + industry.toString() + "\n");
+        badgeRepository.save(industry);
+
+        log.info("Creating badge Panelist");
+        Badge panelist = BadgeFactory.badgeFactory("Panelist", "Panelist", 0f, 0f, 0f);
+        panelist.setRequiredRight("badge_type_panelist");
+        panelist.setWarningMessage("Panelist check in. See your coordinator!");
+        results.append("    Creating " + panelist.toString() + "\n");
+        badgeRepository.save(panelist);
+
+        log.info("Creating badge Staff");
+        Badge staff = BadgeFactory.badgeFactory("Staff", "Staff", 0f, 0f, 0f);
+        staff.setRequiredRight("badge_type_staff");
+        staff.setWarningMessage("Staff check in. See your coordinator!");
+        // Clear stripe color and text - it's already printed
+        for (AgeRange a : staff.getAgeRanges()) {
+            a.setStripeColor("#FFFFFF");
+            a.setStripeText("");
+        }
+        results.append("    Creating " + staff.toString() + "\n");
+        badgeRepository.save(staff);
+
+
+
+    }
+
 
     private HashMap<String, Right> getRightsHashMap() {
         HashMap<String, Right> rightHashMap = new HashMap<>();

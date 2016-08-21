@@ -8,11 +8,13 @@ import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.spring.annotation.ViewScope;
 import com.vaadin.ui.*;
-import org.kumoricon.site.attendee.AttendeePrintView;
-import org.kumoricon.site.attendee.window.PrintBadgeWindow;
 import org.kumoricon.model.attendee.Attendee;
 import org.kumoricon.model.badge.Badge;
 import org.kumoricon.site.BaseView;
+import org.kumoricon.site.attendee.AttendeePrintView;
+import org.kumoricon.site.attendee.window.OverrideRequiredForEditWindow;
+import org.kumoricon.site.attendee.window.OverrideRequiredWindow;
+import org.kumoricon.site.attendee.window.PrintBadgeWindow;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.PostConstruct;
@@ -55,7 +57,7 @@ public class AttendeeSearchView extends BaseView implements View, AttendeePrintV
         tblResult.setContainerDataSource(attendeeBeanList);
         tblResult.setVisibleColumns(new String[] { "firstName", "lastName", "badgeName", "badgeNumber", "age", "zip", "checkedIn"});
         tblResult.setColumnHeaders("First Name", "Last Name", "Badge Name", "Badge Number", "Age", "Zip", "Checked In");
-
+        tblResult.addStyleName("kumoHandPointer");
         tblResult.addItemClickListener((ItemClickEvent.ItemClickListener) itemClickEvent -> {
 
             handler.showAttendee((Integer) itemClickEvent.getItem().getItemProperty("id").getValue());
@@ -127,5 +129,16 @@ public class AttendeeSearchView extends BaseView implements View, AttendeePrintV
     public void showPrintBadgeWindow(List<Attendee> attendeeList) {
         PrintBadgeWindow printBadgeWindow = new PrintBadgeWindow(this, handler, attendeeList);
         showWindow(printBadgeWindow);
+    }
+
+    public void showOverrideRequiredWindow(AttendeeSearchPresenter presenter, List<Attendee> attendeeList)
+    {
+        OverrideRequiredWindow overrideRequiredWindow = new OverrideRequiredWindow(presenter, "reprint_badge", attendeeList);
+        showWindow(overrideRequiredWindow);
+    }
+
+    public void showOverrideEditWindow(AttendeeSearchPresenter presenter, AttendeeDetailWindow attendeeDetailWindow) {
+        OverrideRequiredForEditWindow window = new OverrideRequiredForEditWindow(presenter, "attendee_edit", attendeeDetailWindow);
+        showWindow(window);
     }
 }

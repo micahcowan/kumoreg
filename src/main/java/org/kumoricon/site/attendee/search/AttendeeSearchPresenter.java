@@ -2,7 +2,6 @@ package org.kumoricon.site.attendee.search;
 
 import com.vaadin.ui.Window;
 import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
-import org.kumoricon.service.print.BadgePrintService;
 import org.kumoricon.model.attendee.Attendee;
 import org.kumoricon.model.attendee.AttendeeHistory;
 import org.kumoricon.model.attendee.AttendeeHistoryRepository;
@@ -10,7 +9,9 @@ import org.kumoricon.model.attendee.AttendeeRepository;
 import org.kumoricon.model.badge.BadgeRepository;
 import org.kumoricon.model.user.User;
 import org.kumoricon.model.user.UserRepository;
+import org.kumoricon.service.print.BadgePrintService;
 import org.kumoricon.service.print.formatter.BadgePrintFormatter;
+import org.kumoricon.service.validate.AttendeeValidator;
 import org.kumoricon.site.BaseView;
 import org.kumoricon.site.attendee.*;
 import org.kumoricon.site.attendee.window.AddNoteWindow;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
-import org.kumoricon.service.validate.AttendeeValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,8 +112,7 @@ public class AttendeeSearchPresenter implements PrintBadgeHandler, OverrideHandl
                 log.info("{} reprinting badge(s) for {}", view.getCurrentUser(), attendee);
                 showAttendeeBadgeWindow(view, attendeeList);
             } else {
-                overrideRequiredWindow = new OverrideRequiredWindow(this, "reprint_badge", attendeeList);
-                view.showWindow(overrideRequiredWindow);
+                view.showOverrideRequiredWindow(this, attendeeList);
             }
         } else {
             if (overrideUser.hasRight("reprint_badge")) {
@@ -124,8 +123,7 @@ public class AttendeeSearchPresenter implements PrintBadgeHandler, OverrideHandl
                 view.notifyError("Override user does not have the required right");
                 log.error("{} requested an override to reprint a badge for {} but {} did not have the reprint_badge right",
                         view.getCurrentUser(), attendee, overrideUser);
-                overrideRequiredWindow = new OverrideRequiredWindow(this, "reprint_badge", attendeeList);
-                view.showWindow(overrideRequiredWindow);
+                view.showOverrideRequiredWindow(this, attendeeList);
             }
         }
     }
@@ -180,7 +178,7 @@ public class AttendeeSearchPresenter implements PrintBadgeHandler, OverrideHandl
 
     @Override
     public BadgePrintFormatter getBadgeFormatter(PrintBadgeWindow printBadgeWindow, List<Attendee> attendees) {
-        return badgePrintService.getCurrentBadgeFormatter(attendees);
+        return badgePrintService.getCurrentBadgeFormatter(attendees, printBadgeWindow.getParentView().getCurrentClientIPAddress());
     }
 
     public void searchChanged(String searchString) {
@@ -202,7 +200,6 @@ public class AttendeeSearchPresenter implements PrintBadgeHandler, OverrideHandl
         }
     }
 
-
     @Override
     public void overrideEditLogin(OverrideRequiredForEditWindow window, String username, String password, AttendeeDetailWindow attendeeDetailWindow) {
         User overrideUser = userRepository.findOneByUsernameIgnoreCase(username);
@@ -220,8 +217,7 @@ public class AttendeeSearchPresenter implements PrintBadgeHandler, OverrideHandl
     public void overrideEditCancel(OverrideRequiredForEditWindow window) { window.close(); }
 
     public void overrideEdit(AttendeeDetailWindow attendeeDetailWindow) {
-        OverrideRequiredForEditWindow window = new OverrideRequiredForEditWindow(this, "attendee_edit", attendeeDetailWindow);
-        view.showWindow(window);
+        view.showOverrideEditWindow(this, attendeeDetailWindow);
     }
 
     @Override

@@ -41,6 +41,7 @@ public class CheckInByBadgeReportView extends BaseView implements View {
         badgeType.setTextInputAllowed(false);
         badgeType.setNullSelectionAllowed(false);
         badgeType.setNewItemsAllowed(false);
+        badgeType.setWidth("400px");
         badgeType.addValueChangeListener((Property.ValueChangeListener) event -> {
             if (event.getProperty() != null) {
                 Badge b = (Badge) event.getProperty().getValue();
@@ -68,6 +69,7 @@ public class CheckInByBadgeReportView extends BaseView implements View {
         dataGrid.setSelectionMode(Grid.SelectionMode.NONE);
         dataGrid.setWidth(1100, Unit.PIXELS);
         dataGrid.setHeightMode(HeightMode.ROW);
+        dataGrid.addStyleName("kumoHeaderOnlyHandPointer");
         setExpandRatio(dataGrid, .9f);
     }
 

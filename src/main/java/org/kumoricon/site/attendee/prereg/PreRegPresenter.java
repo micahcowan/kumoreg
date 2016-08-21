@@ -1,15 +1,14 @@
 package org.kumoricon.site.attendee.prereg;
 
-import org.kumoricon.service.print.formatter.BadgePrintFormatter;
-import org.kumoricon.site.attendee.AttendeePrintView;
-import org.kumoricon.service.print.BadgePrintService;
-import org.kumoricon.site.attendee.PrintBadgeHandler;
-import org.kumoricon.site.attendee.window.BadgeWarningWindow;
-import org.kumoricon.site.attendee.window.PrintBadgeWindow;
 import org.kumoricon.model.attendee.Attendee;
 import org.kumoricon.model.attendee.AttendeeRepository;
 import org.kumoricon.model.badge.BadgeRepository;
+import org.kumoricon.service.print.BadgePrintService;
+import org.kumoricon.service.print.formatter.BadgePrintFormatter;
 import org.kumoricon.site.BaseView;
+import org.kumoricon.site.attendee.AttendeePrintView;
+import org.kumoricon.site.attendee.PrintBadgeHandler;
+import org.kumoricon.site.attendee.window.PrintBadgeWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +109,7 @@ public class PreRegPresenter implements PrintBadgeHandler {
 
     @Override
     public BadgePrintFormatter getBadgeFormatter(PrintBadgeWindow printBadgeWindow, List<Attendee> attendees) {
-        return badgePrintService.getCurrentBadgeFormatter(attendees);
+        return badgePrintService.getCurrentBadgeFormatter(attendees, printBadgeWindow.getParentView().getCurrentClientIPAddress());
     }
 
     public Boolean validateBeforeCheckIn(PreRegCheckInWindow window, Attendee attendee) {
@@ -160,5 +159,21 @@ public class PreRegPresenter implements PrintBadgeHandler {
 
     public void continueCheckIn(Attendee attendee) {
         view.navigateTo(PreRegView.VIEW_NAME + "/" + view.getSearchString() + "/" + attendee.getId().toString());
+    }
+
+    /**
+     * Enable the check in button for the given window if attendee info has been verified and the consent form
+     * has been received for minors.
+     * @param window Pre Reg check in window
+     */
+    public void checkIfAttendeeCanCheckIn(PreRegCheckInWindow window) {
+        Attendee attendee = window.getAttendee();
+        if (attendee.isMinor() && !window.parentalConsentFormReceived()) {
+            window.setCheckInButtonEnabled(false);
+        } else if (window.informationVerified()) {
+            window.setCheckInButtonEnabled(true);
+        } else {
+            window.setCheckInButtonEnabled(false);
+        }
     }
 }
