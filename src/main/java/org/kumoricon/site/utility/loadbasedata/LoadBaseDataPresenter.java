@@ -127,6 +127,7 @@ public class LoadBaseDataPresenter {
             {"manage_pass_types", "Add/edit badge types"},
             {"manage_roles", "Add/edit security roles"},
             {"manage_devices", "Add/edit devices (computer/printer mappings)"},
+            {"import_user_data", "Import names of users/staff, and generate user names"},
             {"import_pre_reg_data", "Import pre-registered attendees and orders"},
             {"load_base_data", "Load default data (users, roles, rights)"}
         };
